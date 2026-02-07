@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Letter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #5F7470;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Falling hearts background */
+        .heart-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .small-heart {
+            position: absolute;
+            color: #889696;
+            font-size: 20px;
+            opacity: 0.6;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            width: 6px;
+            height: 6px;
+            background: #B8BDB5;
+            border-radius: 50%;
+            animation: sparkleAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes sparkleAnimation {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        /* Main window */
+        .window {
+            background: #E0E2DB;
+            border: 8px solid #889696;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Window header */
+        .window-header {
+            background: linear-gradient(135deg, #889696, #B8BDB5);
+            padding: 10px;
+            border-bottom: 3px solid #5F7470;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 2px 2px 0 0;
+        }
+
+        .window-title {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .window-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-circle {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .btn-red {
+            background: #ff5f56;
+        }
+
+        .btn-yellow {
+            background: #ffbd2e;
+        }
+
+        .btn-green {
+            background: #27c93f;
+        }
+
+        /* Content area */
+        .window-content {
+            padding: 30px;
+            text-align: center;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .hearts-decoration {
+            font-size: 24px;
+            margin-bottom: 20px;
+            letter-spacing: 15px;
+            color: #5F7470;
+        }
+
+        .question {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 25px;
+            font-weight: normal;
+            background: #5F7470;
+            padding: 12px 16px;
+            border-radius: 18px;
+            width: fit-content;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-left: -10px !important;
+            margin-right: auto !important;
+            min-height: 20px;
+            text-align: left;
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background-color: white;
+            margin-left: 4px;
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Pixel cat */
+        .pixel-cat {
+            margin: 20px 0;
+            font-size: 60px;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            border: 3px solid #5F7470;
+            background: white;
+            color: #5F7470;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: #5F7470;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .btn-yes {
+            width: 80px;
+        }
+
+        .btn-no {
+            width: 80px;
+        }
+
+        .message-hi {
+            position: absolute;
+            font-size: 48px;
+            color: #5F7470;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeInText 1.5s ease-in-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInText {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="heart-bg" id="heartBg"></div>
+    
+    <div class="window">
+        <div class="window-header">
+            <span class="window-title">Zee</span>
+            <div class="window-buttons">
+                <div class="btn-circle btn-red"></div>
+                <div class="btn-circle btn-yellow"></div>
+                <div class="btn-circle btn-green"></div>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="hearts-decoration">♥ ♥ ♥</div>
+            <div class="question" id="questionText"></div>
+            <div class="question" id="secondText" style="display: none;"></div>
+            <div class="question" id="thirdText" style="display: none;"></div>
+            <div class="question" id="fourthText" style="display: none;"></div>
+            <div class="question" id="fifthText" style="display: none;"></div>
+            <div class="question" id="sixthText" style="display: none;"></div>
+            <div class="question" id="seventhText" style="display: none;"></div>
+            <div class="question" id="eighthText" style="display: none;"></div>
+            <div class="question" id="ninthText" style="display: none;"></div>
+            <div class="question" id="tenthText" style="display: none;"></div>
+            <div class="question" id="eleventhText" style="display: none;"></div>
+            <div class="question" id="twelfthText" style="display: none;"></div>
+            <div class="question" id="thirteenthText" style="display: none;"></div>
+            <div class="question" id="fourteenthText" style="display: none;"></div>
+            <div class="question" id="fifteenthText" style="display: none;"></div>
+            <div class="question" id="sixteenthText" style="display: none;"></div>
+            <div class="question" id="seventeenthText" style="display: none;"></div>
+            <div class="question" id="eighteenthText" style="display: none;"></div>
+            <div class="question" id="nineteenthText" style="display: none;"></div>
+            <div class="question" id="twentiethText" style="display: none;"></div>
+            <div class="question" id="twentyfirstText" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Typing animation
+        const text = "Hiya Zee";
+        const questionText = document.getElementById('questionText');
+        let index = 0;
+
+        function typeText() {
+            if (index < text.length) {
+                questionText.textContent += text.charAt(index);
+                index++;
+                setTimeout(typeText, 80); // Adjust typing speed here (ms per character)
+            } else {
+                // After first message finishes, show and start typing the second message
+                document.getElementById('secondText').style.display = 'block';
+                setTimeout(typeSecondText, 1000);
+            }
+        }
+
+        // Second typing animation
+        const text2 = "Im sorry if I caused you any pain or struggle..";
+        const secondText = document.getElementById('secondText');
+        let index2 = 0;
+
+        function typeSecondText() {
+            if (index2 < text2.length) {
+                secondText.textContent += text2.charAt(index2);
+                index2++;
+                setTimeout(typeSecondText, 80);
+            } else {
+                // After second message finishes, show and start typing the third message
+                document.getElementById('thirdText').style.display = 'block';
+                setTimeout(typeThirdText, 1000);
+            }
+        }
+
+        // Third typing animation
+        const text3 = "I didn't like how things between us ended.. and Im sure you already have so much on your plate right now..";
+        const thirdText = document.getElementById('thirdText');
+        let index3 = 0;
+
+        function typeThirdText() {
+            if (index3 < text3.length) {
+                thirdText.textContent += text3.charAt(index3);
+                index3++;
+                setTimeout(typeThirdText, 80);
+            } else {
+                document.getElementById('fourthText').style.display = 'block';
+                setTimeout(typeFourthText, 1000);
+            }
+        }
+
+        const messages = [
+            "I created this for you.. to let you know that..",
+            "You aren't alone.. you have wonderful people around you <3",
+            "You are strong, especially during tough times.. but that doesn't mean you be hard on yourself when things don't go your way..",
+            "You are enough <3",
+            "I didn't break up with you because you weren't enough or anything to do with your capability..",
+            "I know that your life is tough right now, and I don't want to put more pressure or stress on you..",
+            "I understand you are doing this for your future and I FULLY SUPPORT!!",
+            "I wanted us to break up so you don't have to feel guilty or worry about us or our relationship.. i want you to worry about yourself and your wellbeing <3",
+            "You can hate me alllllllllll you like, if that helps you",
+            "Just know that you are one special person to me, and will always look back on our happiest moments together..",
+            "I want to leave this last gift to you..",
+            "I want to close our chapter.. our book..",
+            "Even if we meet again, I don't think us being in a relationship together would be a good idea-",
+            "but hey - we don't know the future-",
+            "I hope you liked this tho.. hehe..",
+            "One last reminder for you..",
+            "Remeber to eat, drink plenty of water.. and..",
+            "Goodnight Zee <3",
+            "One last reminder for you..",
+            "Remember to eat, drink plently of water.. and..",
+            "Goodnight Zee <3"
+        ];
+
+        const messageIds = [
+            'fourthText', 'fifthText', 'sixthText', 'seventhText', 'eighthText', 'ninthText',
+            'tenthText', 'eleventhText', 'twelfthText', 'thirteenthText', 'fourteenthText',
+            'fifteenthText', 'sixteenthText', 'seventeenthText', 'eighteenthText', 'nineteenthText',
+            'twentiethText', 'twentyfirstText'
+        ];
+
+        let currentMessageIndex = 0;
+        let currentCharIndex = 0;
+
+        function typeMessage() {
+            const elementId = messageIds[currentMessageIndex];
+            const messageText = messages[currentMessageIndex];
+            const element = document.getElementById(elementId);
+
+            if (currentCharIndex < messageText.length) {
+                element.textContent += messageText.charAt(currentCharIndex);
+                currentCharIndex++;
+                setTimeout(typeMessage, 80);
+            } else {
+                // Scroll to bottom after message is complete
+                const windowContent = document.querySelector('.window-content');
+                windowContent.scrollTop = windowContent.scrollHeight;
+
+                currentMessageIndex++;
+                if (currentMessageIndex < messages.length) {
+                    document.getElementById(messageIds[currentMessageIndex]).style.display = 'block';
+                    currentCharIndex = 0;
+                    setTimeout(typeMessage, 1000);
+                }
+            }
+        }
+
+        function typeFourthText() {
+            typeMessage();
+        }
+
+        // Start typing animation after a short delay
+        setTimeout(typeText, 500);
+
+        // Create falling hearts
+        const heartBg = document.getElementById('heartBg');
+        
+        function createFallingHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('small-heart');
+            heart.innerHTML = '♥';
+            
+            const left = Math.random() * 100;
+            const duration = 3 + Math.random() * 4;
+            const delay = Math.random() * 2;
+            
+            heart.style.left = left + '%';
+            heart.style.top = '-30px';
+            heart.style.animationDuration = duration + 's';
+            heart.style.animationDelay = delay + 's';
+            
+            heartBg.appendChild(heart);
+            
+            // Remove after animation completes
+            setTimeout(() => heart.remove(), (duration + delay) * 1000);
+        }
+
+        // Continuously create falling hearts
+        setInterval(createFallingHeart, 300);
+
+        // Sparkle cursor effect
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.5) { // Create sparkles randomly as you move
+                createSparkle(e.clientX, e.clientY);
+            }
+            if (Math.random() > 0.6) {
+                createSparkle(e.clientX, e.clientY);
+            }
+        });
+
+        // Click particle explosion
+        document.addEventListener('click', (e) => {
+            createParticleExplosion(e.clientX, e.clientY);
+        });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            
+            const randomOffsetX = (Math.random() - 0.5) * 100;
+            const randomOffsetY = (Math.random() - 0.5) * 100;
+            
+            sparkle.style.left = x + 'px';
+            sparkle.style.top = y + 'px';
+            sparkle.style.setProperty('--tx', randomOffsetX + 'px');
+            sparkle.style.setProperty('--ty', randomOffsetY + 'px');
+            
+            document.body.appendChild(sparkle);
+            
+            // Remove after animation completes
+            setTimeout(() => sparkle.remove(), 600);
+        }
+
+        function createParticleExplosion(x, y) {
+            const particleCount = 12;
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (i / particleCount) * Math.PI * 2;
+                const velocity = 150;
+                const offsetX = Math.cos(angle) * velocity;
+                const offsetY = Math.sin(angle) * velocity;
+                
+                const particle = document.createElement('div');
+                particle.classList.add('sparkle');
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.setProperty('--tx', offsetX + 'px');
+                particle.style.setProperty('--ty', offsetY + 'px');
+                
+                document.body.appendChild(particle);
+                
+                // Remove after animation completes
+                setTimeout(() => particle.remove(), 600);
+            }
+        }
+
+    </script>
+</body>
+</html>
